@@ -1,2 +1,0 @@
-# YewonDanaLee.github.io
-CV
