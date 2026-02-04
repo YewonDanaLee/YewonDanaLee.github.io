@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>365mc | STT-Based Consultation Optimization</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="../css/mdb.min.css" rel="stylesheet">
+  <link href="../css/aos.css" rel="stylesheet">
+  <link href="../css/main.css" rel="stylesheet">
+
+  <style>
+    .section { margin-bottom: 3rem; }
+    .section h2 { margin-bottom: 1rem; }
+    .badge-tech { margin-right: .4rem; }
+    /* Keeping formula style in case you want to emphasize specific metrics later */
+    .formula {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: .5rem;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container my-5">
+
+  <section class="section">
+    <h1 class="fw-light">365mc · STT-Based Consultation Conversion Optimization</h1>
+    <p class="text-muted">
+      Industry–Academic Collaboration Project with 365mc
+    </p>
+
+    <span class="badge bg-info badge-tech">Data Analysis</span>
+    <span class="badge bg-info badge-tech">NLP (STT/LLM)</span>
+    <span class="badge bg-info badge-tech">Statistical Analysis</span>
+    <span class="badge bg-info badge-tech">Consultation Strategy</span>
+  </section>
+
+  <section class="section">
+    <h2 class="h4">Project Overview</h2>
+    <p>
+      This project was conducted in collaboration with <strong>365mc</strong>, 
+      a leading Korean medical institution specializing in liposuction and obesity treatment.
+      The objective was to identify key factors driving consultation-to-visit conversion
+      and to design data-driven consultation guidelines.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 class="h4">1. Problem Definition</h2>
+    <p>
+      Despite high demand, significant performance variations existed across the consultation team.
+    </p>
+    <ul>
+      <li><strong>Performance Gaps:</strong> Large disparity in conversion rates between top and bottom consultants.</li>
+      <li><strong>Dependency on Experience:</strong> Quality relied heavily on individual know-how rather than standardized protocols.</li>
+      <li><strong>Data Quality Issues:</strong> Existing STT data suffered from speaker-mixing and domain-specific transcription errors.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2 class="h4">2. Analytical Approach & Pipeline</h2>
+
+    <h5>2-1. Data Pipeline Engineering</h5>
+    <ul>
+      <li>Built a <strong>Speaker Diarization + STT pipeline</strong> optimized for Korean medical consultations.</li>
+      <li>Applied <strong>LLM-based post-processing</strong> to correct medical terminology errors.</li>
+    </ul>
+
+    <h5 class="mt-4">2-2. Multi-Perspective Analysis</h5>
+    <p>
+      Consultation data was analyzed across three distinct dimensions to isolate success factors:
+    </p>
+    <ul>
+      <li><strong>Customer Metadata:</strong> Demographics and history.</li>
+      <li><strong>Voice Features:</strong> Tone, speed, and silence intervals.</li>
+      <li><strong>Text Analysis (STT):</strong> Keyword usage and conversation structure.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2 class="h4">3. Key Insights</h2>
+
+    <h5>3-1. Conversion Drivers</h5>
+    <p>
+      Explicit appointment proposals increased conversion rates by over <strong>18 percentage points</strong>.
+      Strategies such as <mark>"schedule first, change later"</mark> significantly lowered customer resistance.
+    </p>
+
+    <h5 class="mt-4">3-2. Negative Signals</h5>
+    <ul>
+      <li>Excessive interruptions by the consultant.</li>
+      <li>Overly long consultation durations without clear closing.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2 class="h4">Conclusion & Outcome</h2>
+    <ul>
+      <li>Delivered actionable, data-driven consultation strategies.</li>
+      <li>Demonstrated that structured communication guidelines substantially improve reservation and visit rates.</li>
+      <li>Reduced dependency on implicit "gut feeling" by quantifying successful conversation patterns.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <p class="text-muted text-small">
+      Role: Project Manager & Data Analyst | Tools: Python, Whisper STT, LLM, Statistical Analysis
+    </p>
+  </section>
+
+</div>
+
+<script src="../scripts/aos.js"></script>
+<script>AOS.init();</script>
+</body>
+</html>
