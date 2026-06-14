@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>강남언니 | Revenue Analytics & Recommendation System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="../css/mdb.min.css" rel="stylesheet">
+  <link href="../css/aos.css" rel="stylesheet">
+  <link href="../css/main.css" rel="stylesheet">
+
+  <style>
+    .section { margin-bottom: 3rem; }
+    .section h2 { margin-bottom: 1rem; }
+    .badge-tech { margin-right: .4rem; margin-bottom: .4rem; }
+    .formula {
+      background: #f8f9fa;
+      padding: 1rem 1.5rem;
+      border-radius: .5rem;
+      font-family: monospace;
+      font-size: .95rem;
+      border-left: 4px solid #6c757d;
+      margin: 1rem 0;
+    }
+    .subsection { margin-top: 2rem; }
+    table { font-size: .9rem; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+    .tag { background: #e9ecef; border-radius: .3rem; padding: .2rem .6rem; font-size: .85rem; font-family: monospace; }
+    .meta-label { font-weight: 600; color: #495057; }
+    .highlight-box {
+      background: #f8f9fa;
+      border-left: 4px solid #0d6efd;
+      padding: 1rem 1.5rem;
+      border-radius: 0 .5rem .5rem 0;
+      margin: 1rem 0;
+    }
+    .theme-header {
+      background: #f0f4ff;
+      border-radius: .5rem;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container my-5" style="max-width: 860px;">
+
+  <!-- Header -->
+  <section class="section">
+    <p class="text-muted text-uppercase fw-semibold" style="font-size:.85rem; letter-spacing:.05em;">
+      Data Consulting Project
+    </p>
+    <h1 class="fw-light mb-1">Revenue Performance Analytics &amp; Personalized Treatment Recommendation System</h1>
+    <p class="text-muted mb-3">LYK Solutions x HealingPaper &nbsp;|&nbsp; 2026</p>
+  </section>
+
+  <!-- Background -->
+  <section class="section">
+    <h2 class="h4">Project Background &amp; Objectives</h2>
+    <p>
+      Partnered with multiple Korean medical aesthetics clinics serving international clientele (Korea, Japan, China, Taiwan) to build a data-driven framework for diagnosing revenue fluctuations and deriving actionable growth strategies.
+      The clinics lacked systematic tools for decomposing performance changes — attributing KPI shifts to specific drivers such as customer mix, treatment mix, acquisition channel mix, or promotional effects — and relied instead on intuition-based management.
+    </p>
+
+    <p class="mt-3"><strong>The engagement was structured around three analytical themes:</strong></p>
+    <ol>
+      <li><strong>Performance fluctuation diagnosis</strong> — a decomposition framework to quantify each factor's contribution to changes in three KPIs: first-visit revenue, repeat purchase rate, and average order value (AOV)</li>
+      <li><strong>AOV growth strategy</strong> — identifying treatment synergies and bundling opportunities to increase per-visit revenue, modeled and verified at the nationality segment level</li>
+      <li><strong>Personalized treatment recommendation system</strong> — a two-stage retrieval model (treatment category → specific product) to assist counselors during real-time consultations</li>
+    </ol>
+  </section>
+
+  <!-- Theme 1 -->
+  <section class="section">
+    <div class="theme-header">
+      <h2 class="h4 mb-0">Theme 1. KPI Fluctuation Decomposition Framework</h2>
+    </div>
+
+    <div class="subsection">
+      <h5>1-1. First-Visit Revenue Analysis</h5>
+      <p>
+        <strong>Problem framing:</strong> Because approximately 80% of customers do not return after their first visit, first-visit revenue is a disproportionately important lever.
+        Diagnosing what drives its fluctuation requires isolating treatment-level and funnel-level effects while controlling for confounders.
+      </p>
+
+      <p><strong>Feature engineering decisions:</strong></p>
+      <p>
+        The analysis was restricted to treatment interaction features and funnel category features, with age excluded despite its dominance as a predictor — because age effects were monotone and already understood, and including it would suppress the explanatory contribution of other variables of strategic interest.
+        Time features (month, weekday/weekend) were included in the model to absorb seasonal and promotional effects, but excluded from the SHAP interpretation layer, preventing confounding of treatment and funnel effects with calendar-driven variation.
+      </p>
+      <p>
+        Rather than analyzing individual treatments — where price variation dominates and masks behavioral patterns — pairwise treatment interactions were constructed as features, allowing the model to capture synergy effects between co-occurring procedures.
+        Treatment interactions were defined using the top-k treatments by customer volume per clinic, limiting the feature space to combinations with sufficient support.
+      </p>
+      <p>
+        Separate models were trained per clinic × nationality combination, motivated by the fact that treatment menus, marketing strategies, and customer preferences differ systematically across national segments.
+        Nationalities with fewer than 1,000 customers were excluded from analysis to ensure statistical reliability.
+      </p>
+
+      <p><strong>Modeling approach:</strong></p>
+      <p>
+        A LightGBM regressor was trained per clinic-nationality segment to predict log-transformed first-visit revenue.
+        SHAP values were computed to attribute the model's predictions to individual features, enabling interpretable decomposition of revenue effects across treatment interactions and funnel categories.
+      </p>
+      <div class="highlight-box">
+        <strong>Output use case:</strong> The derived treatment-funnel revenue profiles serve as an evidence base for new customer acquisition and promotional strategy design.
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h5>1-2. Repeat Purchase Rate Decomposition</h5>
+      <p>
+        <strong>Problem framing:</strong> Repeat purchase rate was defined at the daily visit level — the proportion of customers visiting on a given day who return within N months.
+        The objective was to decompose period-over-period changes in this rate into contributions from distinct driver categories: customer demographic mix, treatment mix, acquisition funnel mix, customer behavioral features, promotional effects, and calendar/seasonal structure.
+      </p>
+
+      <p><strong>Methodology:</strong></p>
+      <p>
+        A LASSO regression model was trained per clinic to predict whether an individual visit would result in a repeat purchase within N months.
+        LASSO was selected for its coefficient interpretability and sparsity-inducing regularization, appropriate given the high-dimensional feature space.
+      </p>
+      <p>Features were grouped into structured categories to enable component-level attribution:</p>
+      <ul>
+        <li><strong>Demographic mix:</strong> nationality, age group, gender</li>
+        <li><strong>Treatment mix:</strong> treatment category set per visit, encoded as multi-hot item sets</li>
+        <li><strong>Acquisition funnel:</strong> mapped from raw funnel name to 10 standardized categories (Messenger/Chat, Domestic Beauty Platform/App, SNS, Search/Portal, Referral, Offline/Walk-in, Phone/Call Center, Marketing Campaign, Overseas Medical Tourism/Influencer/Agency, B2B Partnership)</li>
+        <li><strong>Promotional effect:</strong> constructed as treatment category × month interaction features, capturing whether specific treatments showed elevated repeat rates in specific months</li>
+        <li><strong>Customer behavioral variables:</strong> prepaid card purchase flag, first-visit payment amount, number of items at first purchase, number of items at current purchase</li>
+        <li><strong>Calendar structure:</strong> month fixed effects to capture residual seasonal patterns not explained by other variables</li>
+      </ul>
+      <p>
+        Daily repeat rate estimates were computed by averaging individual visit-level predicted probabilities across all visits on each day.
+        Period-over-period changes were then decomposed using Shapley value decomposition across the feature groups — attributing the gap between a period's repeat rate and the historical average to each driver category's contribution in percentage points.
+      </p>
+      <div class="highlight-box">
+        <strong>Model evaluation:</strong> AUC of ~0.77–0.78 and MAE of ~0.01 across clinics, indicating sufficient calibration for trend-level analysis.<br><br>
+        <strong>Output structure:</strong> For any flagged period of unusual repeat rate performance, the framework outputs a contribution table attributing the deviation (in pp) to each driver group, followed by a drill-down into the specific subfactors within the dominant driver.
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h5>1-3. Average Order Value (AOV) Decomposition</h5>
+      <p>
+        <strong>Problem framing:</strong> Decompose day-level AOV changes into contributions from shifts in treatment category proportions and funnel proportions, enabling the clinic to identify which assortment or acquisition changes are driving AOV movement.
+      </p>
+      <p>
+        An XGBoost regressor was trained to predict daily AOV using daily treatment category proportions and funnel category proportions as features.
+        SHAP analysis was applied to attribute AOV variance to individual features — both single-category effects and pairwise interaction effects.
+        Models were trained separately per clinic × nationality segment, consistent with the segmentation rationale applied in Theme 1-1.
+      </p>
+    </div>
+  </section>
+
+  <!-- Theme 2 -->
+  <section class="section">
+    <div class="theme-header">
+      <h2 class="h4 mb-0">Theme 2. AOV Growth Strategy via Treatment Bundling Analysis</h2>
+    </div>
+
+    <p>
+      <strong>Objective:</strong> Identify which treatment combinations produce synergistic revenue effects, and translate these into concrete bundling and promotional recommendations actionable at the clinic level.
+    </p>
+
+    <p><strong>Analytical framework — three complementary methods:</strong></p>
+    <ol>
+      <li><strong>XGBoost + SHAP:</strong> Identified which treatment category proportions and pairwise interaction features most strongly predicted daily AOV — both the direction (positive/negative) and magnitude of each effect</li>
+      <li><strong>LASSO regression with interaction terms:</strong> Estimated linear coefficients for individual treatment categories and explicitly constructed pairwise interaction terms, providing sparse and interpretable estimates of which combinations produced additive revenue effects beyond individual treatment contributions</li>
+      <li><strong>Four-quadrant portfolio analysis:</strong> Plotted each treatment category on a 2D space of (repeat treatment rate × treatment volume), classifying treatments into four strategic roles — high-traffic/high-retention anchors, growth candidates, niche/premium offerings, and low-priority categories — to inform how each treatment should be positioned relative to bundling strategy</li>
+    </ol>
+
+    <p>
+      Analysis was conducted at two levels: clinic-wide (all nationalities combined) and per-nationality segment (KR, JP, CN, TW), given consistent evidence across Themes 1-1 and 1-3 that optimal treatment combinations differed materially by national segment.
+    </p>
+
+    <div class="highlight-box">
+      <strong>Output:</strong> For each clinic × nationality combination, ranked treatment bundling recommendations with supporting evidence from all three methods — identifying which bundles to prioritize, which single-treatment promotions to expand, which combinations to avoid based on negative interaction coefficients, and which acquisition funnels to invest or disinvest based on their AOV contribution direction.
+    </div>
+  </section>
+
+  <!-- Theme 3 -->
+  <section class="section">
+    <div class="theme-header">
+      <h2 class="h4 mb-0">Theme 3. Personalized Treatment Recommendation System</h2>
+    </div>
+
+    <p>
+      A two-stage retrieval recommendation system was designed for real-time use by counselors during consultations.
+      The system operates sequentially: first recommending a treatment mid-category, then recommending a specific treatment (sub-category) within the selected mid-category.
+    </p>
+
+    <div class="subsection">
+      <h5>Stage 1 — Mid-Category Treatment Recommendation</h5>
+      <p>
+        <strong>Use case:</strong> Given a new customer's basic profile (age, gender, nationality, acquisition funnel), recommend which mid-category treatments to discuss — either as standalone recommendations or as complementary suggestions given a treatment the customer has already expressed interest in.
+      </p>
+
+      <p><strong>Architecture — Two-Tower model with LightGCN pretraining:</strong></p>
+
+      <p><em>LightGCN pretraining:</em></p>
+      <p>
+        A LightGCN (Light Graph Convolutional Network) model was first trained on historical user–treatment interaction data, learning graph-structured relationship embeddings for both users and treatment items.
+        These embeddings encode collaborative filtering signals — which treatment combinations tend to co-occur across similar users — in a compact vector form.
+        For new users without interaction history, hash-bucket-based embeddings were used as a fallback, enabling cold-start inference.
+      </p>
+
+      <p><em>Two-Tower model:</em></p>
+      <ul>
+        <li><strong>User Tower:</strong> Concatenates embeddings for age (integer), gender (categorical index), nationality (top-5 per clinic, remainder as "other"), and funnel category (standardized index) with the LightGCN user embedding. Passed through an MLP to produce a user representation vector.</li>
+        <li><strong>Item Tower:</strong> Concatenates the treatment mid-category's parent macro-category embedding with the LightGCN item embedding. Passed through an MLP to produce an item representation vector.</li>
+        <li><strong>Scoring:</strong> Inner product between user and item representation vectors produces a relevance score per treatment. Top-K treatments by score are returned as recommendations.</li>
+      </ul>
+
+      <div class="highlight-box">
+        <strong>Evaluation:</strong> Hit@1 = 0.3856, Hit@3 = 0.6932 on held-out test data.<br><br>
+        Model behavior was validated via counterfactual sensitivity analysis — inspecting how recommendations shift when nationality, age, or gender inputs are changed while holding other inputs fixed — to verify that the model learned demographically meaningful patterns rather than spurious correlations.
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h5>Stage 2 — Sub-Category Treatment Recommendation</h5>
+      <p>
+        <strong>Use case:</strong> Once a mid-category is selected (either by the customer or from Stage 1 output), recommend a specific treatment product within that category.
+        This stage incorporates the customer's treatment history to personalize recommendations based on past price tier and procedure type exposure.
+      </p>
+
+      <p><strong>Additional features over Stage 1:</strong></p>
+      <ul>
+        <li><strong>Historical treatment binary columns:</strong> A set of binary indicator features encoding which treatment sub-categories the customer has received in prior visits, structured as a dictionary input</li>
+        <li><strong>Price ratio vector:</strong> A 3-dimensional vector (high / mid / low) encoding the proportion of the customer's historical procedures at each price tier — providing a compact representation of price sensitivity and spending history without requiring exact price values</li>
+      </ul>
+
+      <p>
+        <strong>Architecture:</strong> Follows the same LightGCN + Two-Tower structure as Stage 1, with the User Tower extended to incorporate historical treatment binary features and price ratio, and the Item Tower extended to include sub-category price tier label embedding.
+      </p>
+
+      <p><strong>Evaluation (selected mid-categories):</strong></p>
+      <div class="table-responsive mb-3">
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr><th>Mid-Category</th><th>Hit@1</th><th>Hit@3</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Laser Lifting</td><td>0.2374</td><td>0.6048</td></tr>
+            <tr><td>Body Contouring</td><td>0.6644</td><td>0.8926</td></tr>
+            <tr><td>Contouring Injection</td><td>0.8372</td><td>0.9302</td></tr>
+            <tr><td>Skin Booster</td><td>0.3603</td><td>0.5942</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Model outputs were validated with the same counterfactual sensitivity analysis applied in Stage 1, additionally testing the effect of changing the historical treatment dictionary input to confirm that past procedure history meaningfully shifts sub-category recommendations.
+      </p>
+    </div>
+  </section>
+
+  <!-- Technical Stack -->
+  <section class="section">
+    <h2 class="h4">Technical Stack</h2>
+    <div class="tag-list">
+      <span class="tag">Python</span>
+      <span class="tag">LightGBM</span>
+      <span class="tag">XGBoost</span>
+      <span class="tag">LASSO</span>
+      <span class="tag">SHAP</span>
+      <span class="tag">Shapley Value Decomposition</span>
+      <span class="tag">LightGCN</span>
+      <span class="tag">Two-Tower Model</span>
+      <span class="tag">MLP</span>
+      <span class="tag">Hash-Bucket Embedding</span>
+      <span class="tag">Collaborative Filtering</span>
+      <span class="tag">Treatment Interaction Features</span>
+      <span class="tag">Funnel Category Mapping</span>
+      <span class="tag">Four-Quadrant Portfolio Analysis</span>
+    </div>
+  </section>
+
+</div>
+
+<script src="../scripts/aos.js"></script>
+<script>AOS.init();</script>
+</body>
+</html>

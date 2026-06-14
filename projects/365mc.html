@@ -12,104 +12,366 @@
   <style>
     .section { margin-bottom: 3rem; }
     .section h2 { margin-bottom: 1rem; }
-    .badge-tech { margin-right: .4rem; }
-    /* Keeping formula style in case you want to emphasize specific metrics later */
+    .badge-tech { margin-right: .4rem; margin-bottom: .4rem; }
     .formula {
       background: #f8f9fa;
-      padding: 1rem;
+      padding: 1rem 1.5rem;
       border-radius: .5rem;
       font-family: monospace;
+      font-size: .95rem;
+      border-left: 4px solid #6c757d;
+      margin: 1rem 0;
+    }
+    .subsection { margin-top: 2rem; }
+    .subsection h5 { margin-bottom: .75rem; }
+    table { font-size: .9rem; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+    .tag { background: #e9ecef; border-radius: .3rem; padding: .2rem .6rem; font-size: .85rem; font-family: monospace; }
+    .meta-label { font-weight: 600; color: #495057; }
+    .highlight-box {
+      background: #f8f9fa;
+      border-left: 4px solid #0d6efd;
+      padding: 1rem 1.5rem;
+      border-radius: 0 .5rem .5rem 0;
+      margin: 1rem 0;
+    }
+    .theme-header {
+      background: #f0f4ff;
+      border-radius: .5rem;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
     }
   </style>
 </head>
 
 <body>
 
-<div class="container my-5">
+<div class="container my-5" style="max-width: 860px;">
 
+  <!-- Header -->
   <section class="section">
-    <h1 class="fw-light">365mc · STT-Based Consultation Conversion Optimization</h1>
-    <p class="text-muted">
-      Industry–Academic Collaboration Project with 365mc
+    <p class="text-muted text-uppercase fw-semibold" style="font-size:.85rem; letter-spacing:.05em;">
+      Industry–Academia Collaboration Project
     </p>
+    <h1 class="fw-light mb-1">Optimizing Purchase Conversion Strategy via STT Counseling Data Analysis</h1>
+    <p class="text-muted mb-3">Growth Hackers × 365mc &nbsp;|&nbsp; 2025</p>
 
-    <span class="badge bg-info badge-tech">Data Analysis</span>
-    <span class="badge bg-info badge-tech">NLP (STT/LLM)</span>
-    <span class="badge bg-info badge-tech">Statistical Analysis</span>
-    <span class="badge bg-info badge-tech">Consultation Strategy</span>
   </section>
 
+  <!-- Background -->
   <section class="section">
-    <h2 class="h4">Project Overview</h2>
+    <h2 class="h4">Project Background &amp; Objectives</h2>
     <p>
-      This project was conducted in collaboration with <strong>365mc</strong>, 
-      a leading Korean medical institution specializing in liposuction and obesity treatment.
-      The objective was to identify key factors driving consultation-to-visit conversion
-      and to design data-driven consultation guidelines.
+      365mc, a leading liposuction clinic in Korea, faced a systematic performance gap between top- and bottom-performing outbound (OB) counselors, with counseling quality entirely dependent on individual counselor skill.
+      The project aimed to replace this intuition-driven system with a data-driven framework by:
     </p>
-  </section>
+    <ol>
+      <li>Building a custom Korean-language Speaker Diarization + STT pipeline from scratch to render raw counseling audio analytically usable</li>
+      <li>Identifying the customer characteristics, counselor voice features, and verbal strategies that drive appointment conversion in OB phone consultations</li>
+      <li>Deriving upselling patterns from inbound (IB) in-clinic surgical consultations</li>
+    </ol>
 
-  <section class="section">
-    <h2 class="h4">1. Problem Definition</h2>
-    <p>
-      Despite high demand, significant performance variations existed across the consultation team.
-    </p>
+    <p class="mt-3"><strong>Three analytical layers were defined and operationalized independently:</strong></p>
     <ul>
-      <li><strong>Performance Gaps:</strong> Large disparity in conversion rates between top and bottom consultants.</li>
-      <li><strong>Dependency on Experience:</strong> Quality relied heavily on individual know-how rather than standardized protocols.</li>
-      <li><strong>Data Quality Issues:</strong> Existing STT data suffered from speaker-mixing and domain-specific transcription errors.</li>
+      <li><strong>Customer META data</strong> — what pre-call customer characteristics correlate with conversion?</li>
+      <li><strong>Counselor voice features</strong> (tone, speed, pitch) — which paralinguistic features are predictive?</li>
+      <li><strong>Counseling STT text</strong> — which specific verbal behaviors and response strategies drive conversion?</li>
     </ul>
   </section>
 
+  <!-- Section 1: STT Pipeline -->
   <section class="section">
-    <h2 class="h4">2. Analytical Approach & Pipeline</h2>
+    <div class="theme-header">
+      <h2 class="h4 mb-0">Theme 1. STT Pipeline Development</h2>
+    </div>
 
-    <h5>2-1. Data Pipeline Engineering</h5>
-    <ul>
-      <li>Built a <strong>Speaker Diarization + STT pipeline</strong> optimized for Korean medical consultations.</li>
-      <li>Applied <strong>LLM-based post-processing</strong> to correct medical terminology errors.</li>
-    </ul>
+    <div class="subsection">
+      <h5>1-1. Problem Diagnosis</h5>
+      <p>The existing vendor transcription (Clova Note) was determined unusable through systematic failure analysis:</p>
+      <ul>
+        <li><strong>Speaker diarization failure:</strong> Overlapping speech collapsed multiple speakers into a single track; brief interruption segments were particularly error-prone, making customer vs. counselor utterance separation impossible</li>
+        <li><strong>Domain transcription errors:</strong> Medical brand terminology was systematically mis-transcribed due to phonetic similarity with common Korean words; the same entity was represented in multiple inconsistent forms across transcripts</li>
+      </ul>
+      <p>These two failure modes necessitated building a full replacement pipeline rather than post-correcting the existing output.</p>
+    </div>
 
-    <h5 class="mt-4">2-2. Multi-Perspective Analysis</h5>
-    <p>
-      Consultation data was analyzed across three distinct dimensions to isolate success factors:
-    </p>
+    <div class="subsection">
+      <h5>1-2. Speaker Diarization Module</h5>
+      <p><strong>Problem framing:</strong> Global SOTA models (e.g., MossFormer2) are trained predominantly on English and multilingual corpora, creating a language gap for Korean — specifically Korean prosody, intonation contours, and overlapping speech patterns. Acquiring labeled, correctly-separated Korean counseling audio at training scale was infeasible due to privacy constraints.</p>
+
+      <p><strong>Dataset construction strategy:</strong></p>
+      <p>Rather than attempting to collect labeled real-world data, a synthetic data construction pipeline was designed:</p>
+      <ul>
+        <li><strong>Source corpora:</strong> KSponSpeech (large-scale Korean naturalistic speech corpus) + WHAM! noise dataset (standard noise augmentation corpus)</li>
+        <li><strong>Synthesis algorithm:</strong> SparseKMix — selected because it generates synthetic overlapping speech with realistic conversational silence and interruption distributions, rather than naively concatenating clean speech segments</li>
+        <li><strong>Output:</strong> High-quality labeled Korean overlapping speech data at training scale, with ground-truth speaker labels known by construction</li>
+      </ul>
+
+      <p><strong>Model fine-tuning:</strong></p>
+      <ul>
+        <li>Base model: MossFormer2 SS 16K</li>
+        <li>Applied <strong>LoRA (Low-Rank Adaptation)</strong>: by freezing the pretrained weights and training only low-rank adapter matrices injected into the model, only 196,608 parameters (0.35% of total weights) required gradient updates — enabling adaptation to Korean speech and overlap characteristics within available compute constraints</li>
+      </ul>
+
+      <p><strong>Loss function redesign:</strong></p>
+      <p>
+        During LoRA training, output signal amplitude became unstable — the existing SI-SNR loss function measures only signal ratios and provides no constraint on absolute amplitude scale.
+        Diagnosed as a LoRA weight scaling instability, the loss function was modified by adding an L1 Loss term:
+      </p>
+      <div class="formula">Loss_total = -(1 - α) × SI-SNR + α × L1 Loss</div>
+      <p>
+        The L1 term forces predicted waveforms to stay within the amplitude envelope of the ground-truth signal, and its sparsity-inducing property additionally suppresses residual noise in silent segments — improving downstream STT accuracy by reducing false activation in non-speech regions.
+      </p>
+
+      <p><strong>Inference strategy for long-form audio:</strong></p>
+      <ul>
+        <li>GPU memory constraints make processing 5+ minute calls in a single forward pass infeasible. Designed a chunked inference approach: 3-minute windows with 10-second overlap</li>
+        <li>Speaker label continuity across chunks is not guaranteed by default. Resolved by computing cosine similarity across the overlap region between adjacent chunks and using it to automatically realign speaker labels — preventing speaker identity flip across chunk boundaries</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h5>1-3. STT Module</h5>
+      <ul>
+        <li><strong>Model selection:</strong> Whisper large-v3, chosen after comparative evaluation of Whisper-family models on transcription accuracy and timestamp stability</li>
+        <li><strong>Output:</strong> Chunk-based timestamps (utterance-level start/end times per speaker), enabling all downstream turn-taking and sequence analyses. Word-level timestamps were also generated for potential future use in fine-grained overlap and interruption detection.</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h5>1-4. LLM Post-Processing Module</h5>
+      <p>A two-pass LLM correction layer (OpenAI GPT-4o mini) was applied after STT to address remaining error modes:</p>
+      <ul>
+        <li><strong>First Pass (domain correction):</strong> A domain-specific lexicon was injected directly into the prompt, covering medical terminology, brand names, and phonetically similar error pairs. This corrected systematic mis-transcriptions that Whisper's general-domain training could not resolve.</li>
+        <li><strong>Second Pass (turn-taking reconstruction):</strong> Timestamp information from both speakers was used to detect fragmented utterances caused by overlapping speech and reorder them into a coherent conversational sequence — reconstructing the actual turn-taking flow rather than outputting interleaved fragments.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Section 2: OB Analysis -->
+  <section class="section">
+    <div class="theme-header">
+      <h2 class="h4 mb-0">Theme 2. OB Counseling Analysis</h2>
+    </div>
+
+    <div class="subsection">
+      <h5>2-1. Customer META Analysis</h5>
+      <p>
+        <strong>Data:</strong> OB counseling records with complete customer survey responses, covering variables including area of concern, prior procedure experience, dietary habits, inquiry count, exercise habits, alcohol consumption, and weight change history.
+      </p>
+      <p>
+        The core question was whether conversion outcome could be predicted from pre-call customer attributes — testing the hypothesis that the customer's decision is partially pre-formed before the call begins.
+      </p>
+      <ul>
+        <li><strong>Categorical variables:</strong> Chi-square test of independence to identify which categorical attributes showed between-group differences in conversion rate</li>
+        <li><strong>Continuous variables:</strong> Mann-Whitney U test (non-parametric, appropriate given non-normal distributions)</li>
+        <li>Variables showing significant between-group differences were subjected to One-vs-Rest subgroup analysis to identify which specific groups drove the effect</li>
+        <li><strong>Interaction effects:</strong> Logistic regression with interaction terms to test whether combinations of META attributes produced effects not explained by main effects alone</li>
+      </ul>
+      <p>Significant variables were carried forward into the META × STT cross-analysis to test whether they also modulate how customers respond to price and risk signals during the call.</p>
+    </div>
+
+    <div class="subsection">
+      <h5>2-2. Counselor Voice Feature Analysis</h5>
+      <p><strong>Data:</strong> Speaker-separated WAV files + STT JSON for OB counseling sessions (success and failure groups)</p>
+
+      <p><strong>Feature extraction (18 features across 6 categories):</strong></p>
+      <div class="table-responsive mb-3">
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr><th>Category</th><th>Features</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Basic</td><td>total_duration, talk_share</td></tr>
+            <tr><td>Tone / Energy</td><td>energy_mean, energy_std</td></tr>
+            <tr><td>Interaction</td><td>turn_count, tpm (turns per minute), overlap_ratio</td></tr>
+            <tr><td>Responsiveness</td><td>agent_latency, cust_latency, max_silence, silence_ratio</td></tr>
+            <tr><td>Engagement</td><td>agent_backchannel, cust_backchannel</td></tr>
+            <tr><td>Fluency / Speed</td><td>pause_frequency, agent_cpm, articulation_rate</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        To isolate counseling behavior from individual counselor baseline differences, six features were normalized at the per-counselor level before analysis:
+        <code>energy_mean</code>, <code>energy_std</code>, <code>agent_cpm</code>, <code>articulation_rate</code>, <code>pause_frequency</code>, <code>agent_latency</code>.
+      </p>
+
+      <p><strong>Analysis pipeline:</strong></p>
+      <ol>
+        <li><strong>Statistical testing:</strong> t-test or Mann-Whitney U test per feature, comparing successful vs. failed calls</li>
+        <li><strong>Logistic regression:</strong> Quantified the direction and magnitude of each feature's effect on conversion probability; features with high collinearity were removed before modeling</li>
+        <li><strong>ML-based conversion prediction:</strong> Random Forest, LightGBM, and XGBoost were trained and compared to assess predictive ceiling and generate feature importance rankings</li>
+        <li><strong>SHAP analysis:</strong> Applied to the LightGBM model to detect nonlinear relationships and threshold effects — specifically to identify whether features had monotone effects or showed optimal ranges</li>
+      </ol>
+    </div>
+
+    <div class="subsection">
+      <h5>2-3. OB STT Text Analysis</h5>
+
+      <p><strong>Tagging schema design:</strong></p>
+      <p>To convert unstructured conversational transcripts into analyzable structured data, a three-layer tagging schema was designed and applied across all OB counseling records.</p>
+
+      <p><strong>Layer 1 — Topic tags (10 categories):</strong></p>
+      <p>
+        Segmented each call into meaning units and assigned a primary topic to each segment.
+        Categories: Consultation Start, Customer Info, Procedure Cost, Side Effects / Risk, Discounts &amp; Benefits, Visit Induction, Past Procedure Experience, Procedure Process, Location Guidance, Appointment Scheduling.
+      </p>
+
+      <p><strong>Layer 2 — Intent tags (5 categories):</strong></p>
+      <p>
+        Classified each utterance by the speaker's communicative intent:
+        Greeting, Verify (information confirmation), Question, Inform (factual delivery), Suggestion (recommendation or action prompt).
+        Within each major topic, the ratio of each intent type was computed separately for counselors and customers, enabling comparison of conversational dynamics in successful vs. failed calls.
+      </p>
+
+      <p><strong>Layer 3 — Flag tags (11 total: 5 customer + 6 counselor):</strong></p>
+
+      <p><em>Customer flags — specific negative or commitment signals:</em></p>
+      <div class="tag-list mb-2">
+        <span class="tag">schedule_unavailable</span>
+        <span class="tag">commit_date</span>
+        <span class="tag">reserve_quit</span>
+        <span class="tag">price_sensitive</span>
+        <span class="tag">risk_worry</span>
+      </div>
+
+      <p><em>Counselor flags — specific persuasion and closing behaviors:</em></p>
+      <div class="tag-list mb-3">
+        <span class="tag">appointment_offer</span>
+        <span class="tag">appointment_confirmed</span>
+        <span class="tag">convince_deadline</span>
+        <span class="tag">convince_promotion</span>
+        <span class="tag">convince_changedate</span>
+        <span class="tag">convince_free</span>
+      </div>
+
+      <p><strong>Analysis 1 — Intent distribution by Topic</strong></p>
+      <p>
+        For each of the three key topics (Procedure, Risk, Price), computed counselor and customer intent ratios separately for successful and failed calls.
+        The difference in intent ratio (success minus failure) identified which communicative behaviors were overrepresented in each outcome group.
+        The hypothesis was that counselors in successful calls actively shape the conversational dynamic differently within each topic — not just saying different things, but using different conversational moves.
+      </p>
+
+      <p><strong>Analysis 2 — Response strategy by negative customer flag</strong></p>
+      <p>
+        Confirmed that negative customer flags occur at comparable frequencies in both successful and failed calls — establishing that the counselor's response to the flag, not the flag's mere presence, is the operative variable.
+        For each negative flag type, analyzed the distribution of counselor flags appearing immediately after the negative flag, comparing success and failure groups.
+        Additionally:
+      </p>
+      <ul>
+        <li>Computed the ratio of each topic transition following each negative flag</li>
+        <li>Performed <strong>log-odds ratio analysis</strong> on keyword n-grams in the counselor utterance immediately following the flag, to identify lexical patterns associated with successful vs. failed responses</li>
+      </ul>
+      <p>
+        For the <code>risk_worry</code> flag specifically, applied SBERT sentence embeddings to cluster customer risk-concern utterances into semantic sub-topics
+        (Pain, Safety/Fear, Efficacy, Recovery, Area/Condition, Skin/Scar), then separately analyzed counselor response patterns within each sub-topic — identifying topic-specific successful and failed verbal strategies through n-gram and log-odds ratio analysis.
+      </p>
+
+      <p><strong>Analysis 3 — Appointment proposal timing</strong></p>
+      <p>
+        Tested whether the timing of the counselor's first appointment proposal (measured by number of topics covered prior to the proposal) affected conversion.
+        Also tested whether price discussion prior to the first appointment proposal moderated conversion rates.
+        Used the <code>appointment_offer</code>, <code>appointment_confirmed</code>, and topic sequence data to reconstruct proposal timing for each call.
+        Analyzed conversion rates as a function of (a) total proposal count, (b) build-up topic count before first proposal, and (c) whether a Price topic appeared before the first proposal.
+      </p>
+
+      <p><strong>Analysis 4 — Flag-based Decision Tree</strong></p>
+      <p>
+        Trained a Decision Tree on counselor flag counts as features with conversion as the target variable.
+        The objective was to identify which specific counselor behaviors most discriminate between converted and non-converted calls, and at what frequency thresholds the effect is largest.
+        The Decision Tree's interpretable split structure allowed identification of the most globally impactful counselor behaviors (those appearing at the root or early splits) and enabled quantification of the conversion rate lift associated with each behavior.
+      </p>
+    </div>
+
+    <div class="subsection">
+      <h5>2-4. META × STT Cross-Analysis</h5>
+      <p>
+        Combined customer META attributes with per-call flag occurrence data to test whether different customer segments (defined by META) generate different rates of negative signals and respond differently to those signals when they occur.
+      </p>
+      <ul>
+        <li><strong>Kruskal-Wallis test</strong> to assess whether flag occurrence frequency differed significantly across META-defined groups</li>
+        <li>For META variables showing significant group differences in flag frequency, further analyzed post-flag conversion rates by group — specifically how much conversion dropped when each flag appeared, and whether the magnitude of that drop varied by customer segment</li>
+      </ul>
+      <p>The goal was to identify whether the same counselor strategy was appropriate across all customers, or whether META information should modulate the counseling approach when specific flags arise.</p>
+    </div>
+  </section>
+
+  <!-- Section 3: IB Analysis -->
+  <section class="section">
+    <div class="theme-header">
+      <h2 class="h4 mb-0">Theme 3. IB (In-Clinic) Consultation Analysis</h2>
+    </div>
+
+    <div class="subsection">
+      <h5>3-1. IB META — Upselling Analysis</h5>
+      <p><strong>Data:</strong> In-clinic surgical consultation records with complete pre-visit survey data and post-consultation surgical outcome records</p>
+      <p>
+        <strong>Upselling operationalization:</strong> Defined upselling as any surgical procedure performed on a body area not indicated as an area of concern in the customer's pre-visit survey.
+        Computed by comparing the set of survey-indicated concern areas against the set of actual surgical areas per patient, with the non-overlapping surgical areas classified as upsell outcomes.
+      </p>
+
+      <p><strong>Analysis design:</strong></p>
+      <ul>
+        <li><strong>BMI:</strong> Continuous variable; analyzed upselling rate and average number of upsell areas across BMI quantile groups</li>
+        <li><strong>Occupation:</strong> Categorical variable; computed average upsell area count per occupation group and ranked</li>
+        <li><strong>Primary concern area → upsell area transition:</strong> Constructed a transition rate matrix from concern area to upsell area to identify which concern area combinations most frequently led to upselling on additional areas</li>
+        <li><strong>Hospital selection criterion:</strong> Chi-square / proportion test comparing upselling rates across customers who cited different primary selection factors, with p-value adjustment for multiple comparisons</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h5>3-2. IB STT — Negative Signal Response Strategy Analysis</h5>
+      <p><strong>Data:</strong> Preprocessed IB STT records (post-noise filtering; IB audio quality issues prevented full-pipeline STT application to the complete dataset)</p>
+      <p>The hypothesis was that optimal response strategies exist for each type of customer negative signal, and that current counselors were not systematically applying them.</p>
+
+      <ol>
+        <li><strong>SBERT sentence embeddings:</strong> Encoded all customer and counselor utterances into dense semantic vectors, enabling semantic similarity-based grouping without relying on exact keyword matching</li>
+        <li><strong>Negative signal classification:</strong> Combined keyword-based rules with semantic similarity to classify customer utterances as negative signals, and further categorized them by signal type (price resistance, side effect concern, general hesitation, etc.)</li>
+        <li><strong>Counselor response type classification:</strong> Classified the counselor's response utterance(s) following each negative signal into response strategy categories (empathy/reassurance, value proof, benefit loss framing, price concession, expertise demonstration)</li>
+        <li><strong>Response strategy matrix construction:</strong> For each (negative signal type, counselor response type) pair, computed the proportion of successful outcomes — yielding a matrix that directly quantifies the conversion lift or penalty associated with each response strategy for each signal type</li>
+        <li><strong>Logistic regression for statistical validation:</strong> Fit a logistic regression model with signal type × response strategy interaction terms to estimate odds ratios for each response strategy, establishing which effects were statistically significant</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Section 4: Conclusions -->
+  <section class="section">
+    <div class="theme-header">
+      <h2 class="h4 mb-0">4. Conclusions &amp; Recommendations</h2>
+    </div>
+    <p>As PM, translated analytical outputs into actionable recommendations across four dimensions:</p>
     <ul>
-      <li><strong>Customer Metadata:</strong> Demographics and history.</li>
-      <li><strong>Voice Features:</strong> Tone, speed, and silence intervals.</li>
-      <li><strong>Text Analysis (STT):</strong> Keyword usage and conversation structure.</li>
+      <li><strong>Survey instrument redesign:</strong> Identified specific limitations of the existing OB pre-call survey and proposed additional question structures to capture customer intent-timing information, enabling counselors to use survey data actively during calls</li>
+      <li><strong>Counselor training guidelines:</strong> Structured the STT findings into topic-specific and flag-specific behavioral guidelines, including concrete verbal strategy examples derived from the n-gram and log-odds ratio analyses</li>
+      <li><strong>IB data collection standards:</strong> Diagnosed the root causes of IB audio quality issues and specified structured recording protocols that would make future IB audio suitable for STT pipeline application</li>
+      <li><strong>IB diarization extension roadmap:</strong> Identified the technical constraints preventing current speaker diarization from working on IB audio (fixed 2-speaker assumption vs. multi-party IB sessions) and proposed dataset construction and model extension approaches to resolve them</li>
     </ul>
   </section>
 
+  <!-- Technical Stack -->
   <section class="section">
-    <h2 class="h4">3. Key Insights</h2>
-
-    <h5>3-1. Conversion Drivers</h5>
-    <p>
-      Explicit appointment proposals increased conversion rates by over <strong>18 percentage points</strong>.
-      Strategies such as <mark>"schedule first, change later"</mark> significantly lowered customer resistance.
-    </p>
-
-    <h5 class="mt-4">3-2. Negative Signals</h5>
-    <ul>
-      <li>Excessive interruptions by the consultant.</li>
-      <li>Overly long consultation durations without clear closing.</li>
-    </ul>
-  </section>
-
-  <section class="section">
-    <h2 class="h4">Conclusion & Outcome</h2>
-    <ul>
-      <li>Delivered actionable, data-driven consultation strategies.</li>
-      <li>Demonstrated that structured communication guidelines substantially improve reservation and visit rates.</li>
-      <li>Reduced dependency on implicit "gut feeling" by quantifying successful conversation patterns.</li>
-    </ul>
-  </section>
-
-  <section class="section">
-    <p class="text-muted text-small">
-      Role: Project Manager & Data Analyst | Tools: Python, Whisper STT, LLM, Statistical Analysis
-    </p>
+    <h2 class="h4">Technical Stack</h2>
+    <div class="tag-list">
+      <span class="tag">Python</span>
+      <span class="tag">MossFormer2</span>
+      <span class="tag">LoRA</span>
+      <span class="tag">KSponSpeech</span>
+      <span class="tag">SparseKMix</span>
+      <span class="tag">Whisper large-v3</span>
+      <span class="tag">GPT-4o mini</span>
+      <span class="tag">SBERT</span>
+      <span class="tag">LightGBM</span>
+      <span class="tag">XGBoost</span>
+      <span class="tag">Random Forest</span>
+      <span class="tag">SHAP</span>
+      <span class="tag">Decision Tree</span>
+      <span class="tag">Logistic Regression</span>
+      <span class="tag">Chi-square Test</span>
+      <span class="tag">Mann-Whitney U Test</span>
+      <span class="tag">Kruskal-Wallis Test</span>
+      <span class="tag">Log-Odds Ratio Analysis</span>
+      <span class="tag">N-gram Analysis</span>
+    </div>
   </section>
 
 </div>

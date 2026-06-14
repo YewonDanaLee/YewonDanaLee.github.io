@@ -12,97 +12,274 @@
   <style>
     .section { margin-bottom: 3rem; }
     .section h2 { margin-bottom: 1rem; }
-    .badge-tech { margin-right: .4rem; }
-    /* Technical highlight box */
-    .tech-box {
+    .badge-tech { margin-right: .4rem; margin-bottom: .4rem; }
+    .subsection { margin-top: 2rem; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+    .tag { background: #e9ecef; border-radius: .3rem; padding: .2rem .6rem; font-size: .85rem; font-family: monospace; }
+    .meta-label { font-weight: 600; color: #495057; }
+    .highlight-box {
       background: #f8f9fa;
-      padding: 1rem;
+      border-left: 4px solid #0d6efd;
+      padding: 1rem 1.5rem;
+      border-radius: 0 .5rem .5rem 0;
+      margin: 1rem 0;
+    }
+    .theme-header {
+      background: #f0f4ff;
       border-radius: .5rem;
-      border-left: 4px solid #17a2b8;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
     }
   </style>
 </head>
 
 <body>
 
-<div class="container my-5">
+<div class="container my-5" style="max-width: 860px;">
 
+  <!-- Header -->
   <section class="section">
-    <h1 class="fw-light">S-OIL · Fuel Demand Forecasting & Network Strategy</h1>
-    <p class="text-muted">
-      Data-Driven Demand Forecasting & Gas Station Network Optimization
+    <p class="text-muted text-uppercase fw-semibold" style="font-size:.85rem; letter-spacing:.05em;">
+      Industry–Academia Collaboration Project
     </p>
-
-    <span class="badge bg-info badge-tech">Time Series Analysis</span>
-    <span class="badge bg-info badge-tech">Econometrics</span>
-    <span class="badge bg-info badge-tech">Compositional Data Analysis</span>
-    <span class="badge bg-info badge-tech">Spatial Optimization</span>
+    <h1 class="fw-light mb-1">Long-Term Retail Petroleum Demand Forecasting &amp; Service Station Network Strategy</h1>
+    <p class="text-muted mb-3">Growth Hackers × S-OIL &nbsp;|&nbsp; 2025</p>
   </section>
 
+  <!-- Background -->
   <section class="section">
-    <h2 class="h4">Project Overview</h2>
+    <h2 class="h4">Project Background &amp; Objectives</h2>
     <p>
-      This project aimed to strengthen S-OIL’s retail business competitiveness by forecasting 
-      long-term fuel demand and optimizing the gas station network strategy. The approach combined 
-      <strong>macroeconomic modeling</strong> with <strong>statistical analysis</strong> to navigate the energy transition era.
+      S-OIL, one of Korea's major integrated energy companies, faced a structural challenge: the spread of EVs and hybrid vehicles, combined with demographic shifts and macroeconomic changes, is expected to erode domestic retail petroleum demand over the medium to long term.
+      This raised an urgent strategic question — how many service stations (S/S) will remain viable, where, and what positioning strategy should S-OIL pursue to remain competitive through 2050.
     </p>
+
+    <p class="mt-3"><strong>The project was structured around three interdependent analytical tracks:</strong></p>
+    <ol>
+      <li><strong>Retail petroleum demand forecasting</strong> — scenario-based, fuel-type-level demand projections through 2050 (gasoline, diesel, kerosene)</li>
+      <li><strong>Service station count estimation</strong> — region-level S/S count projections through 2050, incorporating demand forecasts and local characteristics</li>
+      <li><strong>S/S network strategy</strong> — identifying strategically viable entry and focus regions, proposing a network fitness metric, and deriving prioritized regional S/S investment recommendations</li>
+    </ol>
   </section>
 
+  <!-- Theme 1 -->
   <section class="section">
-    <h2 class="h4">1. Mid-to-Long Term Demand Forecasting</h2>
-    <p>
-      We developed forecasting models for various fuel types spanning a <strong>30-year horizon</strong>.
-    </p>
-    <ul>
-      <li><strong>Macro-Integration:</strong> Incorporated crude oil prices, vehicle ownership trends, and policy variables.</li>
-      <li><strong>Structural Analysis:</strong> Identified statistical change points reflecting shifts in consumption patterns.</li>
-    </ul>
-  </section>
+    <div class="theme-header">
+      <h2 class="h4 mb-0">Theme 1. Long-Term Retail Petroleum Demand Forecasting</h2>
+    </div>
 
-  <section class="section">
-    <h2 class="h4">2. Fuel Mix & Structural Change Analysis</h2>
-    <p>
-      To understand shifts in the energy market share (Fuel Mix), we applied 
-      <strong>Compositional Data Analysis (CoDA)</strong> techniques.
-    </p>
+    <div class="subsection">
+      <h5>1-1. Research &amp; Model Selection</h5>
+      <p>Prior to modeling, conducted a systematic review of existing long-term demand forecasting approaches across two categories:</p>
 
-    <div class="tech-box mt-3 mb-3">
-      <strong>Methodology:</strong>
-      <ul class="mb-0">
-        <li>Applied <strong>CLR (Centered Log-Ratio)</strong> transformation to handle closed-simplex share data.</li>
-        <li>Conducted <strong>PCA</strong> to interpret inter-fuel relationships and substitution effects.</li>
+      <p><strong>Statistical and economic time-series models:</strong></p>
+      <p>
+        Reviewed ARIMAX-based multivariate time-series forecasting (applied in Korean health insurance expenditure projections by KIHASA) and Transformer-based AI models for port throughput forecasting (KAIST).
+        Concluded that AI-based deep learning models were unsuitable for this task — their reliance on historical data patterns makes them structurally ill-equipped for long-horizon forecasting where structural regime changes (EV transition, policy inflection) are the key drivers, and their low interpretability is incompatible with scenario-based strategic planning.
+      </p>
+
+      <p><strong>National agency energy models:</strong></p>
+      <p>
+        Reviewed KEEI's EGMS, the US EIA's WEPS+/NEMS, and Cambridge's E3ME (including the FTT:Transport submodule), which model vehicle type transitions, consumer behavior, social influence, and technology cost dynamics.
+        These large-scale models are not reproducible externally, but their transport submodules provided methodological grounding for the vehicle-fleet-based demand decomposition approach adopted here.
+      </p>
+
+      <div class="highlight-box">
+        <strong>Model selection rationale:</strong> The final approach uses a hybrid of economic/statistical models that (1) can produce narrow-scope forecasts for retail petroleum specifically, (2) are externally reproducible and interpretable, and (3) enable scenario branching. AI-based models and single-model time-series approaches were explicitly rejected on these grounds.
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h5>1-2. Policy Scenario Design</h5>
+      <p>
+        The Korean government's 2030 NDC targets a 40% reduction in greenhouse gas emissions from 2018 levels.
+        Analyzing the actual annual reduction rate from 2018 to 2022 (approximately 1.9% per year), the projected NDC achievement rate under current policy continuity is approximately 60% — implying the NDC target would be reached around 2035 rather than 2030, and full carbon neutrality around 2070 rather than 2050.
+      </p>
+      <p>Based on this analysis, three scenarios were defined:</p>
+      <ul>
+        <li><strong>High scenario:</strong> Carbon neutrality achieved in 2065 (accelerated policy)</li>
+        <li><strong>Mid scenario:</strong> Carbon neutrality achieved in 2070 (current policy trajectory)</li>
+        <li><strong>Low scenario:</strong> Carbon neutrality achieved in 2075 (decelerated policy)</li>
+      </ul>
+      <p class="text-muted" style="font-size:.9rem;">The 5-year interval between scenarios follows the Korean government's "National Carbon Neutrality and Green Growth Basic Plan" update cycle, providing institutional grounding for the scenario spacing.</p>
+    </div>
+
+    <div class="subsection">
+      <h5>1-3. Transportation Fuel (Gasoline + Diesel) Demand Forecasting</h5>
+      <p>
+        <strong>Decomposition structure:</strong> Transportation fuel demand was decomposed into vehicle fleet composition × fuel efficiency, allowing policy scenarios to be translated into fuel demand through vehicle stock projections rather than requiring direct demand-side assumptions.
+      </p>
+
+      <p><strong>Gasoline vehicle fleet projection:</strong></p>
+      <ul>
+        <li>Hybrid vehicle fleet was projected using a <strong>Gompertz S-curve</strong>, selected for its saturation property — appropriate for technologies that expand rapidly but eventually plateau. Hybrid vehicle sales share was projected under each scenario reflecting current momentum (34% sales share in Q1 2025) and future EV penetration effects.</li>
+        <li>A <strong>hybrid-to-gasoline fuel consumption correction factor</strong> was derived empirically: paired comparisons of hybrid vs. corresponding gasoline model fuel efficiency across 10 top-selling hybrid models yielded an average correction factor of approximately 0.7. Statistical validation was performed in two stages: (1) a two-sample t-test confirmed that hybrid and gasoline fuel efficiencies are significantly different (p &lt; 0.0001); (2) a <strong>TOST (Two One-Sided Tests)</strong> equivalence test confirmed that hybrid efficiency × 0.7 is statistically equivalent to gasoline efficiency (p ≈ 0.046), validating the correction factor.</li>
+        <li>EV penetration projections used a <strong>Dynamic Bass Diffusion Model</strong>, allowing the innovation coefficient (p) and imitation coefficient (q) to vary over time to accommodate mid-period policy changes that accelerate or decelerate adoption curves.</li>
+      </ul>
+
+      <p><strong>Diesel vehicle fleet projection:</strong></p>
+      <ul>
+        <li>Diesel passenger and commercial vehicle fleets were projected separately given their different regulatory environments. Domestic and international diesel vehicle regulations (Euro 7, domestic equivalent policies) were incorporated as structural constraints.</li>
+        <li>Freight diesel vehicles were treated as a separate category due to their different replacement cycle and higher per-vehicle fuel consumption.</li>
+      </ul>
+
+      <p><strong>Regression modeling:</strong></p>
+      <p>After generating vehicle fleet projections for each scenario, OLS regression was used to translate fleet counts into fuel demand:</p>
+      <ul>
+        <li>Gasoline demand: R² = 0.8613, MAE = 3,094,447</li>
+        <li>Diesel demand: R² = 0.9734, MAE = 1,950,319 (separate coefficients for passenger/commercial and freight, reflecting ~3× higher per-vehicle consumption of freight vehicles)</li>
       </ul>
     </div>
-    
-    <p>
-      This allowed us to link structural market shifts to external drivers such as EV adoption and environmental regulations.
-    </p>
+
+    <div class="subsection">
+      <h5>1-4. Heating Fuel (Kerosene) Demand Forecasting</h5>
+      <p>
+        Kerosene demand is primarily seasonal (winter heating) driven by heating substitute adoption (city gas, electric heating) rather than vehicle fleet dynamics — requiring a different model structure.
+      </p>
+      <p>
+        <strong>SARIMA</strong> was selected to capture both trend and seasonality in monthly kerosene consumption data. The model was validated by backtesting over a historical holdout period and confirmed through residual diagnostics (residuals should be white noise for a well-specified model).
+      </p>
+      <p>
+        <strong>Minimum value correction:</strong> Pure SARIMA extrapolation would eventually project demand approaching zero, which is structurally implausible. A floor derived from structural analysis of non-substitutable kerosene use cases was applied, producing bounded projections that converge to a non-zero minimum.
+      </p>
+    </div>
   </section>
 
+  <!-- Theme 2 -->
   <section class="section">
-    <h2 class="h4">3. Gas Station Network Optimization</h2>
-    <p>
-      Based on the demand forecasts, we estimated the optimal spatial distribution of gas stations to maximize network efficiency.
-    </p>
-    <ul>
-      <li><strong>Supply-Demand Balance:</strong> Estimated regional gaps between fuel demand and station supply.</li>
-      <li><strong>Cannibalization Analysis:</strong> Quantified negative impacts between adjacent stations within the network.</li>
-      <li><strong>Decision Support:</strong> Established data-driven criteria for new station openings and strategic closures.</li>
-    </ul>
+    <div class="theme-header">
+      <h2 class="h4 mb-0">Theme 2. Long-Term Service Station Count Estimation</h2>
+    </div>
+
+    <div class="subsection">
+      <h5>2-1. Deep Learning-Based S/S Count Projection</h5>
+      <p>
+        A region-level deep learning model was built to project S/S count trajectories per province/metropolitan area (광역시도) through 2050. Deep learning was selected over statistical models specifically because of the need to capture nonlinear interactions between high-dimensional variables (population, vehicle registrations, road length, urbanized area, industrial composition, adjacent region spillovers) that vary substantially across regions.
+      </p>
+      <p>The model incorporated historical S/S count trends per region, fuel demand projections from Theme 1, and regional structural variables as covariates.</p>
+
+      <p><strong>Three regional decay curve typologies were identified:</strong></p>
+      <ul>
+        <li><strong>Metropolitan areas (특별시/광역시):</strong> Rapid early decline (through ~2035) as high land costs accelerate closures, followed by a slower decline as residual demand stabilizes</li>
+        <li><strong>General provinces (시/도):</strong> Gradual early decline, with acceleration in the later period as EV penetration reaches critical mass</li>
+        <li><strong>Special regions (Jeju, Sejong):</strong> Idiosyncratic trajectories dominated by region-specific factors (tourism demand, government policy, population plan vs. actual)</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h5>2-2. AI-Based Regional Clustering</h5>
+      <p>Two complementary clustering approaches were applied to group regions by future S/S business viability:</p>
+
+      <p><strong>k-Means Clustering with PCA:</strong></p>
+      <p>
+        Five macroeconomic and demographic variables were collected per city/county (population, GRDP, road length, urbanized area, vehicle registrations). PCA was applied for dimensionality reduction before clustering, with feature weights set proportional to each variable's explanatory power for S/S count.
+      </p>
+
+      <p><strong>GCN (Graph Convolutional Network) Clustering:</strong></p>
+      <p>
+        Cities and counties were represented as nodes in a graph, with edges defined by geographic adjacency and inter-regional traffic flow volume. GCN propagates node features through the graph structure, allowing each node's representation to incorporate information from neighboring nodes — capturing spatial spillover effects that non-graph models cannot represent.
+      </p>
+
+      <p><strong>Cluster validation through non-obvious pairings:</strong></p>
+      <ul>
+        <li><strong>Gwacheon (경기) &amp; Ulleungdo (경북):</strong> Both have constrained S/S counts driven by geographic confinement (greenbelt and island constraints respectively), low road length, and limited fleet size</li>
+        <li><strong>Dongducheon (경기) &amp; Wando (전남):</strong> A declining satellite city and a rural coastal county cluster together through shared urban-flight/aging dynamics</li>
+        <li><strong>Seosan (충남) &amp; Gangneung (강원):</strong> Industrial and tourism cities with similar population and road length despite very different industry bases</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h5>2-3. Four-Quadrant Strategic Typology</h5>
+      <p>Regions were classified on a 2D matrix of (S-OIL S/S market share within region) × (projected S/S count decline rate through 2050), producing four strategic quadrants:</p>
+      <div class="table-responsive mb-3">
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr><th>Quadrant</th><th>Market Share</th><th>Decline Rate</th><th>Strategic Implication</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Q1</td><td>High</td><td>Low</td><td>Maintain — well-positioned in resilient markets</td></tr>
+            <tr><td>Q2</td><td>High</td><td>High</td><td>Risk — high exposure in shrinking markets</td></tr>
+            <tr><td>Q3</td><td>Low</td><td>High</td><td>Accept — already low presence, let market contract</td></tr>
+            <tr><td>Q4</td><td>Low</td><td>Low</td><td>Entry candidate — resilient market with room to grow</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-muted" style="font-size:.9rem;">This framework was evaluated at two time horizons (2035, 2050) to distinguish near-term from long-term strategic priorities, as some regions shift quadrants between the two periods.</p>
+    </div>
   </section>
 
+  <!-- Theme 3 -->
   <section class="section">
-    <h2 class="h4">Conclusion & Impact</h2>
-    <ul>
-      <li>Provided actionable insights for long-term retail strategy under declining demand scenarios.</li>
-      <li>Enabled proactive responses to energy transition trends.</li>
-      <li>Optimized asset allocation by identifying low-efficiency sites and high-potential opening spots.</li>
-    </ul>
+    <div class="theme-header">
+      <h2 class="h4 mb-0">Theme 3. S/S Network Strategy</h2>
+    </div>
+
+    <div class="subsection">
+      <h5>3-1. Entry Candidate Region Selection</h5>
+      <p>
+        Regions classified as Q4 (low S-OIL share, low projected decline) were further evaluated on regional fundamentals to identify priority entry targets.
+        Key criteria: per-S/S petroleum sales volume, GRDP trajectory, population projections, industrial anchor presence, and geographic/logistics positioning.
+      </p>
+      <p><strong>Priority entry regions identified:</strong></p>
+      <ul>
+        <li><strong>Daejeon Metropolitan City:</strong> Geographic hub (convergence of Gyeongbu and Honam expressways, KTX/SRT), anchor for advanced manufacturing and R&amp;D (ABCD+QR national initiatives, nano-semiconductor industrial complex)</li>
+        <li><strong>Chungcheongbuk-do / Chungcheongnam-do:</strong> High intra-regional disparity — top-5 cities by per-S/S sales volume (Cheongju, Eumseong, Cheonan, Asan) show volumes comparable to Daejeon despite provincial averages appearing mediocre; these specific cities have GRDP growth, logistics access, and proximity to the Seoul metro area</li>
+        <li><strong>Gyeonggi-do:</strong> High fixed petroleum demand driven by satellite city growth and large-scale industrial/logistics anchors (Pangyo Techno Valley, Hwaseong industrial parks). Focus cities: Goyang, Suwon, Yongin, Hanam; de-prioritize Yeoncheon, Pocheon, Dongducheon, Yeoju (high S/S density, low per-S/S sales)</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h5>3-2. Non-Entry Focus Regions</h5>
+      <ul>
+        <li><strong>Seoul (Q3):</strong> High land costs produce near-term S/S decline, but absolute fuel demand remains large (logistics, taxi, delivery concentration); long-run residual demand justifies maintaining presence</li>
+        <li><strong>Incheon (Q3):</strong> New city development (Songdo, Geomdan) drawing population from Seoul, producing faster absolute demand growth; recommended as near-term focus through 2035</li>
+        <li><strong>Sejong (Q3):</strong> S/S projection reflects current below-target population (392,000 vs. 2030 government target of 800,000); strategy remains contingent on National Assembly relocation and presidential office policy</li>
+        <li><strong>Gangwon (Q4):</strong> Low decline rate reflects geographic constraints (mountainous terrain, scattered communities) rather than demand resilience; per-S/S sales volume is low — flagged as low-priority despite Q4 classification</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h5>3-3. Network Fitness Metric</h5>
+      <p>A risk-adjusted sales metric was proposed to provide a quantitative criterion for evaluating network optimization decisions:</p>
+      <div style="background:#f8f9fa; padding:1rem 1.5rem; border-radius:.5rem; font-family:monospace; font-size:.95rem; border-left:4px solid #6c757d; margin:1rem 0;">
+        Network Fitness = Σ (S-OIL S/S sales per location × regional S/S survival rate)
+      </div>
+      <p>
+        This metric weights each station's revenue contribution by the probability that stations in its region survive to a future date, operationalizing the concept that a high-revenue station in a rapidly contracting market is less strategically valuable than a comparable station in a stable market.
+        The survival rate is derived directly from the regional S/S count projections produced in Theme 2.
+      </p>
+    </div>
   </section>
 
+  <!-- Technical Stack -->
   <section class="section">
-    <p class="text-muted text-small">
-      Role: Data Scientist / Analyst | Keywords: Econometric Modeling, PCA, Strategic Planning
+    <h2 class="h4">Technical Stack</h2>
+    <div class="tag-list">
+      <span class="tag">Python</span>
+      <span class="tag">SARIMA</span>
+      <span class="tag">Bass Diffusion Model</span>
+      <span class="tag">Dynamic Bass Model</span>
+      <span class="tag">Gompertz S-Curve</span>
+      <span class="tag">Richards Curve</span>
+      <span class="tag">Logistic Curve</span>
+      <span class="tag">OLS Regression</span>
+      <span class="tag">TOST (Equivalence Testing)</span>
+      <span class="tag">Two-Sample t-Test</span>
+      <span class="tag">Curve Fitting</span>
+      <span class="tag">Neural ODE</span>
+      <span class="tag">Deep Learning</span>
+      <span class="tag">k-Means Clustering</span>
+      <span class="tag">PCA</span>
+      <span class="tag">GCN (Graph Convolutional Network)</span>
+      <span class="tag">Four-Quadrant Typology</span>
+    </div>
+  </section>
+
+  <!-- Data Sources -->
+  <section class="section">
+    <h2 class="h4">Data Sources</h2>
+    <p class="text-muted">
+      Statistics Korea (population projections) · Ministry of Land / Ministry of Environment (vehicle registration statistics) · Opinet (S/S sales and pricing data) · PEDSIS (national petroleum information system) · National carbon neutrality policy documents · KEEI, EIA, Cambridge E3ME (reference models)
     </p>
   </section>
 
